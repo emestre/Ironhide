@@ -8,6 +8,7 @@ import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 import com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions;
 import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 
+import com.mindbodyonline.ironhide.PageObjects.PageObject;
 import org.hamcrest.Matcher;
 
 /**
@@ -45,5 +46,25 @@ public class ListItem<T> extends MindbodyView<T> {
     public T checkChildView(MindbodyView<T> viewToMatch, Matcher<View> toCheck) {
         item.onChildView(viewToMatch.getSelector()).check(ViewAssertions.matches(toCheck));
         return returnGeneric();
+    }
+
+    public <E extends PageObject> E performOnChildView(MindbodyView<T> viewToMatch, ViewAction toPerform, Class<E> type) {
+        item.onChildView(viewToMatch.getSelector()).perform(toPerform);
+        return returnGeneric(type);
+    }
+
+    public <E extends PageObject> E checkChildView(MindbodyView<T> viewToMatch, Matcher<View> toCheck, Class<E> type) {
+        item.onChildView(viewToMatch.getSelector()).check(ViewAssertions.matches(toCheck));
+        return returnGeneric(type);
+    }
+
+    public <E extends PageObject> E clickChildView(MindbodyView<T> viewToClick, Class<E> type) {
+        item.onChildView(viewToClick.getSelector()).perform(ViewActions.click());
+        return returnGeneric(type);
+    }
+
+    public <E extends PageObject> E childViewIsDisplayed(MindbodyView<T> viewToMatch, Class<E> type) {
+        item.onChildView(viewToMatch.getSelector()).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        return returnGeneric(type);
     }
 }

@@ -1,5 +1,9 @@
 apply plugin: 'android-library'
-apply plugin: 'maven-publish'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+group = "com.mindbodyonline.ironhide"
+version = "1.2.1"
 
 android {
     compileSdkVersion 19
@@ -25,20 +29,48 @@ task coreLibJar(type: Jar) {
     from fileTree(dir: 'build/classes/debug')
 }
 
+artifacts {
+    archives coreLibJar
+}
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId 'org.gradle.ironhide'
-            artifactId 'Ironhide'
-            version '1'
+signing {
+    sign configurations.archives
+}
 
-            artifact coreLibJar
-        }
-    }
+uploadArchives {
     repositories {
-        maven {
-            url 'http://mirrors.ibiblio.org/maven/' // change to point to your repo, e.g. http://my.org/repo
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Ironhide'
+                packaging 'jar'
+                description 'Testing fixture for MB Android applications'
+
+                scm {
+                    connection 'scm:svn:http://foo.googlecode.com/svn/trunk/'
+                    developerConnection 'scm:svn:https://foo.googlecode.com/svn/trunk/'
+                    url 'http://foo.googlecode.com/svn/trunk/'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'eliot.mestre'
+                        name 'Eliot Mestre'
+
+                    }
+                }
+            }
         }
     }
 }

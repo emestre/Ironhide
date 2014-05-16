@@ -3,6 +3,7 @@ package com.mindbodyonline.ironhide.Infrastructure.MindbodyViews;
 
 import android.view.View;
 
+import com.mindbodyonline.ironhide.PageObjects.PageObject;
 import org.hamcrest.Matcher;
 
 import com.google.android.apps.common.testing.ui.espresso.ViewAction;
@@ -58,6 +59,18 @@ public class MindbodyView<T> {
     }
 
     /**
+     * Performs an Espresso ViewAction on an element
+     *
+     * @param type The type of the PageObject to return
+     * @param viewAction The ViewAction to execute
+     * @return The model returned by interacting with the element
+     */
+    protected <E extends PageObject> E  performAction(Class<E> type, ViewAction viewAction) {
+        onView(getSelector()).perform(viewAction);
+        return returnGeneric(type);
+    }
+
+    /**
      * Checks if an element matches a certain value using an Espresso ViewMatcher
      *
      * @param viewMatcher The ViewMatcher used to check the element
@@ -83,6 +96,21 @@ public class MindbodyView<T> {
     }
 
     /**
+     * Used whenever interacting with an element to return the correct following model
+     *
+     * @param type The type of PageObject to return
+     * @return The model returned by interacting with the element
+     */
+    protected <E extends PageObject> E returnGeneric(Class<E> type) {
+        try {
+            return type.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * ViewActions
      */
 
@@ -92,6 +120,10 @@ public class MindbodyView<T> {
 
     public T click() {
         return performAction(ViewActions.click());
+    }
+
+    public <E extends PageObject> E click(Class<E> type) {
+        return performAction(type, ViewActions.click());
     }
 
     public T pressBack() {
